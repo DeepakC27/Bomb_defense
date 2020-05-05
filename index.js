@@ -1,7 +1,8 @@
 const ARENA_HEIGHT = 500
 const ARENA_WIDTH = 500
+const BOMB_SPEED = 25
 const BOMBER_DAMAGE_COUNT = 15
-const USER_DAMAGE_COUNT = 50
+const USER_DAMAGE_COUNT = 30
 const MAX_HEALTH = 150
 const BARRIER_SETTINGS = {
   SPEED: 25,
@@ -10,6 +11,8 @@ const BARRIER_SETTINGS = {
 window.GAME_STATUS = 0
 
 var arenaRef, userHealthBar, bomberHealthBar, barrier
+var leftMov = 1
+var topMov = 1
 var userDamage = 0
 var bomberDamage = 0
 
@@ -31,30 +34,37 @@ window.onload = () => {
 }
 
 startGame = () => {
-  let bombInst = new Bomb()
-  let bomb1 = bombInst.createBomb('bomb1')
-  bombInst.fireBomb(bomb1)
-  setTimeout(() => {
-    let bomb2 = bombInst.createBomb('bomb2')
-    bombInst.fireBomb(bomb2)
-  }, 3000)
+  let bomb1 = createBomb()
+  fireBomb(bomb1)
+  // setTimeout(() => {
+  //   let bomb2 = createBomb()
+  //   fireBomb(bomb2)
+  // }, 3000)
+}
+
+createBomb = () => {
+  window.bomb = document.createElement('img')
+  bomb.setAttribute('class', 'bomb')
+  bomb.setAttribute('src', './bombImage.png')
+  bomb.style.top = '15px'
+  bomb.style.left = (Math.random() * (400 - 0) + 0) + 'px'
+  arenaRef.appendChild(bomb)
+  return bomb
 }
 
 stopGame = () => {
   window.GAME_STATUS = 0
-  let bombList = document.getElementsByClassName('bomb')
-  Array.from(bombList).map(ele => {
-    clearInterval(ele.TIMER_FUNC)
-    arenaRef.removeChild(ele)
-  })
+  clearInterval(window.TimerFunc)
+  bomb.style.top = '220px'
+  bomb.style.left = '220px'
 }
 
 getArenaPos = () => arenaRef.getBoundingClientRect()
 
 /* ----------------Bomb Specific actions-------------------*/
 
-detectBarrierCollision = (bombRef) => {
-  let bombBounds = bombRef.getBoundingClientRect()
+detectBarrierCollision = () => {
+  let bombBounds = bomb.getBoundingClientRect()
   let barrierBounds = barrier.getBoundingClientRect()
   barrierBounds = {
     minLeft: Math.abs(barrierBounds.x),
@@ -72,11 +82,42 @@ detectBarrierCollision = (bombRef) => {
     return true
   }
   return false
+
 }
 
-checkDamage = (bombRef) => {
-  let posY = bombRef.offsetTop
+
+moveBomb = (bombRef) => {
+  let pos = { x: bombRef.offsetLeft, y: bombRef.offsetTop }
+  let arenaBounds = getArenaPos()
   let bombBounds = bombRef.getBoundingClientRect()
+
+  if (bombBounds.right >= (arenaBounds.right -5) || pos.x < 0) {
+    leftMov *= -1
+  }
+  if (bombBounds.bottom >= (arenaBounds.bottom - 5) || pos.y <= 0) {
+    topMov *= -1
+  }
+
+  if (detectBarrierCollision()) {
+    topMov *= -1
+  }
+  checkDamage(bombBounds)
+
+  if (!window.GAME_STATUS) {
+    return
+  }
+  bomb.style.left = ((pos.x) + (BOMB_SPEED * leftMov)) + 'px'
+  bomb.style.top = ((pos.y) + (BOMB_SPEED * topMov)) + 'px'
+}
+
+fireBomb = (bombRef) => {
+  window.TimerFunc = setInterval(() => {
+    moveBomb(bombRef)
+  }, 50)
+}
+
+checkDamage = (bombBounds) => {
+  let posY = bomb.offsetTop
   let arenaBounds = getArenaPos()
   if ([userDamage, bomberDamage].includes(MAX_HEALTH)) {
     stopGame()
@@ -131,56 +172,4 @@ moveUserBar = (type) => {
     posX = ARENA_WIDTH - BARRIER_SETTINGS.WIDTH
   }
   barrier.style.left = (posX + speed) + 'px'
-}
-
-/* --------------BOMB CLASS------------- */
-class Bomb {
-
-  constructor () {
-    this.BOMB_SPEED = 25
-    // this.LEFT_MOV = 1
-    // this.TOP_MOV = 1
-  }
-
-  createBomb = (id) => {
-    let bomb = document.createElement('img')
-    bomb.setAttribute('class', 'bomb')
-    bomb.setAttribute('src', './bombImage.png')
-    bomb.style.top = '15px'
-    bomb.style.left = (Math.random() * (400 - 0) + 0) + 'px'
-    bomb.LEFT_MOV = 1
-    bomb.TOP_MOV = 1
-    arenaRef.appendChild(bomb)
-    return bomb
-  }
-
-  fireBomb = (bombRef) => {
-    bombRef.TIMER_FUNC = setInterval(() => {
-      this.moveBomb(bombRef)
-    }, 50)
-  }
-
-  moveBomb = (bombRef) => {
-    let pos = { x: bombRef.offsetLeft, y: bombRef.offsetTop }
-    let arenaBounds = getArenaPos()
-    let bombBounds = bombRef.getBoundingClientRect()
-
-    if (bombBounds.right >= (arenaBounds.right -5) || pos.x < 0) {
-      bombRef.LEFT_MOV *= -1
-    }
-    if (bombBounds.bottom >= (arenaBounds.bottom - 5) || pos.y <= 0) {
-      bombRef.TOP_MOV *= -1
-    }
-
-    if (detectBarrierCollision(bombRef)) {
-      bombRef.TOP_MOV *= -1
-    }
-    checkDamage(bombRef)
-
-    if (!window.GAME_STATUS) {
-      return
-    }
-    bombRef.style.left = ((pos.x) + (this.BOMB_SPEED * bombRef.LEFT_MOV)) + 'px'
-    bombRef.style.top = ((pos.y) + (this.BOMB_SPEED * bombRef.TOP_MOV)) + 'px'
-  }
 }
