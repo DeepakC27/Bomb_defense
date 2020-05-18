@@ -18,8 +18,7 @@ Open index.html into a browser
 
 ### Pending Work
 - Spawned bombs collision detection to be added
-- Colliosn detection to be improved for the boundries
-- Segrigation of code
+- Collision detection to be improved for the boundries & defense bar
 - Converting each module into classes with their isolated functionality.
 
 
