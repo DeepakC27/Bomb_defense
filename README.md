@@ -2,7 +2,12 @@
 
 
 ### About
-Simple game created in vanilla JS.
+Simple bomb defense game created in vanilla JS.
+
+
+### TechStack
+- HTML & CSS
+- Vanialla JS
 
 
 
@@ -18,6 +23,5 @@ Open index.html into a browser
 - Converting each module into classes with their isolated functionality.
 
 
-
-#### Inspiration
+### Inspiration
 Was bored because of power cut....
