@@ -1,7 +1,7 @@
 {
   "name": "defence-game",
   "version": "1.0.0",
-  "description": "Arean defend game",
+  "description": "Bomber defense game",
   "main": "index.html",
   "scripts": {
     "start": "parcel index.html --open",
