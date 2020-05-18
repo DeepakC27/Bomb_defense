@@ -7,7 +7,7 @@ Simple bomb defense game created in vanilla JS.
 
 ### TechStack
 - HTML & CSS
-- Vanialla JS
+- JS
 
 
 
